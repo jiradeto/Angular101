@@ -1,38 +1,11 @@
 import { Component } from '@angular/core';
+import { PostsService } from '../services/post.service'
 
 @Component({
+  moduleId: module.id,
   selector: 'user',
-  template: ` 
-  <h1>{{name}}</h1>
-  <p> Email: {{email}}</p>
-  <p> Address: {{address.street}} {{address.city}}, {{address.country}}</p>
-  <button (click)="toggleHobbies()">{{showHobbies ? "Hide Hobbies": "Show Hobbies"}}</button> 
-  <div *ngIf="showHobbies">
-    <h3> Hobbies </h3>
-    <ul>
-      <li *ngFor="let hobby of hobbies; let i = index">
-        {{hobby}} <button (click)="deleteHobby(i)">X</button>
-      </li>
-    </ul>
-    <form (submit)="addHobby(hobby.value)"> 
-      <label> Add Hobby: </label><br />
-      <input type="text" #hobby /><br />
-    </form>
-  </div>
-
-  <form>
-    <label>Name: </label><br />
-    <input type="text" name="name" [(ngModel)]= "name" /><br/>
-    <label>Email: </label><br />
-    <input type="text" name="email" [(ngModel)]= "email" /><br/>
-    <label>Street: </label><br />
-    <input type="text" name="street" [(ngModel)]= "address.street" /><br/>
-    <label>City: </label><br />
-    <input type="text" name="city" [(ngModel)]= "address.city" /><br/>
-    <label>Street: </label><br />
-    <input type="text" name="country" [(ngModel)]= "address.country" /><br/>
-  </form>
-  `
+  templateUrl: 'user.component.html',
+  providers: [PostsService]
 })
 export class UserComponent {
   name: string;
@@ -40,8 +13,9 @@ export class UserComponent {
   address: address;
   hobbies: string[];
   showHobbies: boolean;
+  posts: Post[];
 
-  constructor() {
+  constructor(private postsService: PostsService) {
     this.name = 'John Doe';
     this.email = 'john@gmail.com'
     this.address = {
@@ -51,21 +25,32 @@ export class UserComponent {
     }
     this.hobbies = ['Music', 'Movies', 'Sports']
     this.showHobbies = false;
+    this.postsService.getPosts().subscribe(posts => {
+      this.posts = posts;
+    });
   }
 
-  toggleHobbies(){
+  toggleHobbies() {
     this.showHobbies = !this.showHobbies;
   }
-  addHobby(hobby){
+  addHobby(hobby) {
     this.hobbies.push(hobby);
   }
-  deleteHobby(i){
-    this.hobbies.splice(i,1)
+  deleteHobby(i) {
+    this.hobbies.splice(i, 1)
   }
 }
+
+
 
 interface address {
   street: string;
   city: string;
   country: string
+}
+
+interface Post {
+  id: number;
+  title: string;
+  body: string;
 }
